@@ -2,24 +2,26 @@
 
 camp=mc16a
 
-dsids=$(cat data/${camp}_all_April.list | grep -v "#" | cut -d . -f 3 | sort)
+dsids=$(cat data/nominal/${camp}.list | grep -v "#" | cut -d / -f 13 | cut -d . -f 1 | sort)
 
 cfg=/publicfs/atlas/atlasnew/higgs/hh2X/huirun/multilepton/leptau/sysProd/hhmlsysprod/HHMLSys/data/config_MC.conf
-
-flist=tmp.flist
-> ${flist}
-for dsid in ${dsids}
-do
-  sample=$(cat data/${camp}_all_April.list | grep ${dsid})
-  outf=/publicfs/atlas/atlasnew/higgs/HHML/Slim_sys_prod/SlimSysNtups_Output/2LSS1Tau/${camp}/${dsid}/
-  if [ ! -d "${sample}" ];then echo "no ${dsid} dir, continue"; continue;fi
-  if [ ! -d ${outf} ];then mkdir ${outf};fi
-  ls ${sample}/* >> ${flist}
-done
-
-#ldsids -> lfiles; numID -> numFile
-ldsids=($(cat ${flist}))
+ldsids=($(cat data/nominal/${camp}.list | grep -v "#"))
 numID=${#ldsids[@]}
+
+#flist=tmp.flist
+#> ${flist}
+#for dsid in ${dsids}
+#do
+#  sample=$(cat data/nomina/${camp}.list | grep ${dsid})
+#  outf=/publicfs/atlas/atlasnew/higgs/HHML/Slim_sys_prod/SlimSysNtups_Output/2LSS1Tau/${camp}/${dsid}/
+#  if [ ! -d "${sample}" ];then echo "no ${dsid} dir, continue"; continue;fi
+#  if [ ! -d ${outf} ];then mkdir ${outf};fi
+#  ls ${sample}/* >> ${flist}
+#done
+#
+##ldsids -> lfiles; numID -> numFile
+#ldsids=($(cat ${flist}))
+#numID=${#ldsids[@]}
 
 intvl=10
 seqs=$(seq 0 ${intvl} ${numID})
@@ -63,7 +65,7 @@ do
   if [ ${it} -ge ${numID} ];then continue;fi
   echo "----- ${it}"
   inf=${ldsids[${it}]}
-  dsid=$(echo ${inf} | cut -d . -f 3)
+  dsid=$(echo ${inf} | cut -d / -f 13 | cut -d . -f 1)
   #dir=$(ls -d gn1/${camp}/*${dsid}*)
   #subfs=$(ls ${dir}/*)
   #subfslist=
@@ -73,7 +75,7 @@ do
   #done
   #echo ${subfslist}
 
-  outf=/publicfs/atlas/atlasnew/higgs/HHML/Slim_sys_prod/SlimSysNtups_Output/2LSS1Tau/${camp}/${dsid}/
+  outf=/publicfs/atlas/atlasnew/higgs/HHML/Slim_sys_prod/SlimSysNtups_Output/2LSS1Tau/nominal/${camp}/
 
   echo "" >> ${executable}
   #echo "python dumpleptau.py -s branchList.txt ${subfslist} -o /eos/user/h/huirun/multilepton/leptau/gn2/${camp}/${dsid}.root -b" >> ${executable}
