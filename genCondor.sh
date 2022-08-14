@@ -1,20 +1,37 @@
 #!/bin/bash
 
 camp=mc16a
+Camp=$(echo ${camp} | sed 's/mc/MC/g')
+slimDir=tauSFCR
 
-dsids=$(cat data/${camp}_all_April.list | grep -v "#" | cut -d . -f 3 | sort)
+dsids=$(cat data/${camp}_all_April.list | grep -v "#" | cut -d . -f 3 | sort | uniq)
+dsids=$(cat ../../MLntuple/gn1/usedDISDs.txt | grep -v "#")
 
+# MVA splitExpr issue in MC??
 cfg=/publicfs/atlas/atlasnew/higgs/hh2X/huirun/multilepton/leptau/sysProd/hhmlsysprod/HHMLSys/data/config_MC.conf
 
 flist=tmp.flist
 > ${flist}
 for dsid in ${dsids}
 do
+  echo ${dsid}
   sample=$(cat data/${camp}_all_April.list | grep ${dsid})
-  outf=/publicfs/atlas/atlasnew/higgs/HHML/Slim_sys_prod/SlimSysNtups_Output/2LSS1Tau/${camp}/${dsid}/
-  if [ ! -d "${sample}" ];then echo "no ${dsid} dir, continue"; continue;fi
-  if [ ! -d ${outf} ];then mkdir ${outf};fi
-  ls ${sample}/* >> ${flist}
+  dupSamp=$(cat data/Cleanlist | grep ${dsid} | grep ${Camp} | grep root)
+  outf=/publicfs/atlas/atlasnew/higgs/HHML/Slim_sys_prod/SlimSysNtups_Output/2LSS1Tau/${slimDir}/${camp}/${dsid}/
+  lsample=(${sample})
+  nsamp=${#lsample[@]}
+  if [ ! -d "${sample}" -a ${nsamp} -eq 1 ];then echo "no ${dsid} dir, continue"; continue;fi
+  if [ -d ${outf} ];then rm -r ${outf};fi
+  if [ ! -d ${outf} ];then mkdir -p ${outf};fi
+  if [ ${nsamp} -gt 1 ];then
+    ls ${dupSamp}/*root >> ${flist}
+    #echo listing dup...${dupSamp}
+    echo listing dup
+  elif [ ${nsamp} -eq 1 ];then
+    ls ${sample}/*root >> ${flist}
+    #echo listing...${sample}
+    echo listing
+  fi
 done
 
 #ldsids -> lfiles; numID -> numFile
@@ -73,7 +90,7 @@ do
   #done
   #echo ${subfslist}
 
-  outf=/publicfs/atlas/atlasnew/higgs/HHML/Slim_sys_prod/SlimSysNtups_Output/2LSS1Tau/${camp}/${dsid}/
+  outf=/publicfs/atlas/atlasnew/higgs/HHML/Slim_sys_prod/SlimSysNtups_Output/2LSS1Tau/${slimDir}/${camp}/${dsid}/
 
   echo "" >> ${executable}
   #echo "python dumpleptau.py -s branchList.txt ${subfslist} -o /eos/user/h/huirun/multilepton/leptau/gn2/${camp}/${dsid}.root -b" >> ${executable}
@@ -90,7 +107,8 @@ done
 
   chmod +x ${executable}
 
-  echo "hep_sub ${executable} -g atlas -os CentOS7 -wt mid -mem 4096 -o ${hepout}/log-0.out -e ${hepout}/log-0.err" >> ${allJobs}
+  #echo "hep_sub ${executable} -g atlas -os CentOS7 -wt mid -mem 4096 -o ${hepout}/log-0.out -e ${hepout}/log-0.err" >> ${allJobs}
+  echo "hep_sub ${executable} -o ${hepout}/log-0.out -e ${hepout}/log-0.err" >> ${allJobs}
 
   echo ""
 done
