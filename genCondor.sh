@@ -92,7 +92,8 @@ done
 
   chmod +x ${executable}
 
-  echo "hep_sub ${executable} -g atlas -os CentOS7 -wt mid -mem 4096 -o ${hepout}/log-0.out -e ${hepout}/log-0.err" >> ${allJobs}
+  #echo "hep_sub ${executable} -g atlas -os CentOS7 -wt mid -mem 4096 -o ${hepout}/log-0.out -e ${hepout}/log-0.err" >> ${allJobs}
+  echo "hep_sub ${executable} -o ${hepout}/log-0.out -e ${hepout}/log-0.err" >> ${allJobs}
 
   echo ""
 done
