@@ -3,6 +3,8 @@
 camp=mc16a
 Camp=$(echo ${camp} | sed 's/mc/MC/g')
 slimDir=tauSFCR
+slimDir=nomFromSys
+slimDir=sysSRCR
 
 dsids=$(cat data/${camp}_all_April.list | grep -v "#" | cut -d . -f 3 | sort | uniq)
 dsids=$(cat ../../MLntuple/gn1/usedDISDs.txt | grep -v "#")
