@@ -6,6 +6,9 @@ slimDir=tauSFCR
 slimDir=nomFromSys
 slimDir=sysSRCR
 
+if [ "$1" != "" ];then camp=$1;fi
+if [ "$2" != "" ];then slimDir=$2;fi
+
 dsids=$(cat data/${camp}_all_April.list | grep -v "#" | cut -d . -f 3 | sort | uniq)
 dsids=$(cat ../../MLntuple/gn1/usedDISDs.txt | grep -v "#")
 
@@ -46,6 +49,7 @@ seqs=$(seq 0 ${intvl} ${numID})
 workarea=$(pwd)
 
 allJobs=jobsSub.sh
+allJobs=sub${camp}.sh
 > ${allJobs}
 
 condor=condor
